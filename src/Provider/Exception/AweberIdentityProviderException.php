@@ -1,24 +1,24 @@
 <?php
 
 /*
- * Gitlab OAuth2 Provider
- * (c) Omines Internetbureau B.V. - https://omines.nl/
+ * Aweber OAuth2 Provider
+ * (c) ElementRoot. - https://www.elementroot.fr/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Omines\OAuth2\Client\Provider\Exception;
+namespace Elementroot\OAuth2\Client\Provider\Exception;
 
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * GitlabIdentityProviderException.
+ * AweberIdentityProviderException.
  *
- * @author Niels Keurentjes <niels.keurentjes@omines.com>
+ * @author Nicolas Gourle <ngourle@gmail.com>
  */
-class GitlabIdentityProviderException extends IdentityProviderException
+class AweberIdentityProviderException extends IdentityProviderException
 {
     /**
      * Creates client exception from response.

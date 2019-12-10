@@ -1,136 +1,114 @@
-<?php
-
-/*
- * Gitlab OAuth2 Provider
- * (c) Omines Internetbureau B.V. - https://omines.nl/
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+<?php 
 
 namespace Elementroot\OAuth2\Client\Provider;
 
+use GuzzleHttp\Psr7\Uri;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use Elementroot\OAuth2\Client\Provider\Exception\AweberIdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
-use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * GitAweberlab.
- *
- * @author Niels Keurentjes <niels.keurentjes@omines.com>
- */
 class Aweber extends AbstractProvider
 {
-    use BearerAuthorizationTrait;
-
-    const PATH_API_USER = '/api/v4/user';
-    const PATH_AUTHORIZE = '/oauth/authorize';
-    const PATH_TOKEN = '/oauth/token';
-    const DEFAULT_SCOPE = 'api';
-    const SCOPE_SEPARATOR = ' ';
-
-    /** @var string */
-    public $domain = 'https://gitlab.com';
-
     /**
-     * Aweber constructor.
+     * Default scopes
      *
-     * @param array $options
-     * @param array $collaborators
+     * @var array
      */
-    public function __construct(array $options, array $collaborators = [])
-    {
-        if (isset($options['domain'])) {
-            $this->domain = $options['domain'];
-        }
-        parent::__construct($options, $collaborators);
-    }
+    public $defaultScopes = ['wl.basic', 'wl.emails'];
 
     /**
-     * Get authorization url to begin OAuth flow.
+     * Base url for authorization.
+     *
+     * @var string
+     */
+    protected $urlAuthorize = 'https://auth.aweber.com/oauth2/authorize';
+
+    /**
+     * Base url for access token.
+     *
+     * @var string
+     */
+    protected $urlAccessToken = 'https://auth.aweber.com/oauth2/token';
+
+    /**
+     * Base url for resource owner.
+     *
+     * @var string
+     */
+    protected $urlResourceOwnerDetails = 'https://api.aweber.com/1.0/accounts';
+
+    /**
+     * Get authorization url to begin OAuth flow
      *
      * @return string
      */
     public function getBaseAuthorizationUrl()
     {
-        return $this->domain . self::PATH_AUTHORIZE;
+        return $this->urlAuthorize;
     }
 
     /**
-     * Get access token url to retrieve token.
-     *
-     * @param array $params
+     * Get access token url to retrieve token
      *
      * @return string
      */
     public function getBaseAccessTokenUrl(array $params)
     {
-        return $this->domain . self::PATH_TOKEN;
+        return $this->urlAccessToken;
     }
 
     /**
-     * Get provider url to fetch user details.
-     *
-     * @param AccessToken $token
-     *
-     * @return string
-     */
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
-    {
-        return $this->domain . self::PATH_API_USER;
-    }
-
-    /**
-     * Get the default scopes used by GitLab.
-     * Current scopes are 'api', 'read_user', 'openid'.
-     *
-     * This returns an array with 'api' scope as default.
+     * Get default scopes
      *
      * @return array
      */
     protected function getDefaultScopes()
     {
-        return [self::DEFAULT_SCOPE];
-    }
-
-    /**
-     * GitLab uses a space to separate scopes.
-     */
-    protected function getScopeSeparator()
-    {
-        return self::SCOPE_SEPARATOR;
+        return $this->defaultScopes;
     }
 
     /**
      * Check a provider response for errors.
      *
-     * @param  ResponseInterface $response
-     * @param  mixed $data Parsed response data
      * @throws IdentityProviderException
+     * @param  ResponseInterface $response
+     * @return void
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        if ($response->getStatusCode() >= 400) {
-            throw GitlabIdentityProviderException::clientException($response, $data);
-        } elseif (isset($data['error'])) {
-            throw GitlabIdentityProviderException::oauthException($response, $data);
+        if (isset($data['error'])) {
+            throw new IdentityProviderException(
+                (isset($data['error']['message']) ? $data['error']['message'] : $response->getReasonPhrase()),
+                $response->getStatusCode(),
+                $response
+            );
         }
     }
 
     /**
      * Generate a user object from a successful user details request.
      *
-     * @param  array       $response
-     * @param  AccessToken $token
-     * @return \League\OAuth2\Client\Provider\ResourceOwnerInterface
+     * @param array $response
+     * @param AccessToken $token
+     * @return AweberResourceOwner
      */
     protected function createResourceOwner(array $response, AccessToken $token)
     {
-        $user = new AweberResourceOwner($response, $token);
+        return new AweberResourceOwner($response);
+    }
 
-        return $user->setDomain($this->domain);
+    /**
+     * Get provider url to fetch user details
+     *
+     * @param  AccessToken $token
+     *
+     * @return string
+     */
+    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    {
+        $uri = new Uri($this->urlResourceOwnerDetails);
+
+        return (string) Uri::withQueryValue($uri, 'access_token', (string) $token);
     }
 }

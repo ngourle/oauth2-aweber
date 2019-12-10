@@ -1,180 +1,84 @@
-<?php
+<?php namespace Elementroot\OAuth2\Client\Provider;
 
-/*
- * Aweber OAuth2 Provider
- * (c) ElementRoot - https://www.elementroot.fr/
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-namespace Elementroot\OAuth2\Client\Provider;
-
-use Aweber\Client;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
-use League\OAuth2\Client\Token\AccessToken;
 
-/**
- * AweberResourceOwner.
- *
- * @author Nicolas Gourle <ngourle@gmail.com>
- */
 class AweberResourceOwner implements ResourceOwnerInterface
 {
-    const PATH_API = '/api/v4/';
-
-    /** @var array */
-    private $data;
-
-    /** @var string */
-    private $domain;
-
-    /** @var AccessToken */
-    private $token;
+    /**
+     * Raw response
+     *
+     * @var array
+     */
+    protected $response;
 
     /**
      * Creates new resource owner.
      *
-     * @param array $response
+     * @param array  $response
      */
-    public function __construct(array $response, AccessToken $token)
+    public function __construct(array $response = array())
     {
-        $this->data = $response;
-        $this->token = $token;
+        $this->response = $response;
     }
 
     /**
-     * Returns the identifier of the authorized resource owner.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return (int) $this->get('id');
-    }
-
-    /**
-     * Returns an authenticated API client.
-     *
-     * Requires optional Gitlab API client to be installed.
-     *
-     * @return Client
-     */
-    public function getApiClient()
-    {
-        if (!class_exists('\\Gitlab\\Client')) {
-            throw new \LogicException(__METHOD__ . ' requires package m4tthumphrey/php-gitlab-api to be installed and autoloaded'); // @codeCoverageIgnore
-        }
-        $client = \Gitlab\Client::create(rtrim($this->domain, '/') . self::PATH_API);
-
-        return $client->authenticate($this->token->getToken(), Client::AUTH_OAUTH_TOKEN);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDomain()
-    {
-        return $this->domain;
-    }
-
-    /**
-     * @param  string $domain
-     * @return $this
-     */
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
-
-        return $this;
-    }
-
-    /**
-     * The full name of the owner.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->get('name');
-    }
-
-    /**
-     * Username of the owner.
-     *
-     * @return string
-     */
-    public function getUsername()
-    {
-        return $this->get('username');
-    }
-
-    /**
-     * Email address of the owner.
-     *
-     * @return string
-     */
-    public function getEmail()
-    {
-        return $this->get('email');
-    }
-
-    /**
-     * URL to the user's avatar.
+     * Get user id
      *
      * @return string|null
      */
-    public function getAvatarUrl()
+    public function getId()
     {
-        return $this->get('avatar_url');
+        return $this->response['id'] ?: null;
     }
 
     /**
-     * URL to the user's profile page.
+     * Get user email
      *
-     * @return string
+     * @return string|null
      */
-    public function getProfileUrl()
+    public function getEmail()
     {
-        return $this->get('web_url');
+        return $this->response['emails']['preferred'] ?: null;
     }
 
     /**
-     * @return AccessToken
-     */
-    public function getToken()
-    {
-        return $this->token;
-    }
-
-    /**
-     * Whether the user is active.
+     * Get user firstname
      *
-     * @return bool
+     * @return string|null
      */
-    public function isActive()
+    public function getFirstname()
     {
-        return 'active' === $this->get('state');
+        return $this->response['first_name'] ?: null;
     }
 
     /**
-     * Whether the user is an admin.
+     * Get user lastname
      *
-     * @return bool
+     * @return string|null
      */
-    public function isAdmin()
+    public function getLastname()
     {
-        return (bool) $this->get('is_admin', false);
+        return $this->response['last_name'] ?: null;
     }
 
     /**
-     * Whether the user is external.
+     * Get user name
      *
-     * @return bool
+     * @return string|null
      */
-    public function isExternal()
+    public function getName()
     {
-        return (bool) $this->get('external', true);
+        return $this->response['name'] ?: null;
+    }
+
+    /**
+     * Get user urls
+     *
+     * @return string|null
+     */
+    public function getUrls()
+    {
+        return isset($this->response['link']) ? $this->response['link'].'/cid-'.$this->getId() : null;
     }
 
     /**
@@ -184,16 +88,6 @@ class AweberResourceOwner implements ResourceOwnerInterface
      */
     public function toArray()
     {
-        return $this->data;
-    }
-
-    /**
-     * @param  string     $key
-     * @param  mixed|null $default
-     * @return mixed|null
-     */
-    protected function get($key, $default = null)
-    {
-        return isset($this->data[$key]) ? $this->data[$key] : $default;
+        return $this->response;
     }
 }
