@@ -15,7 +15,7 @@ class Aweber extends AbstractProvider
      *
      * @var array
      */
-    public $defaultScopes = ['wl.basic', 'wl.emails'];
+    public $defaultScopes = ['account.read', 'list.read', 'subscriber.read'];
 
     /**
      * Base url for authorization.
