@@ -1,12 +1,12 @@
 {
-    "name": "omines/oauth2-gitlab",
-    "description": "GitLab OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
+    "name": "ngourle/oauth2-aweber",
+    "description": "Aweber OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
     "license": "MIT",
     "authors": [
         {
-            "name": "Niels Keurentjes",
-            "email": "niels.keurentjes@omines.com",
-            "homepage": "https://www.omines.nl/"
+            "name": "Nicolas GOURLE",
+            "email": "ngourle@gmail.com",
+            "homepage": "https://www.elementroot.fr/"
         }
     ],
     "keywords": [
@@ -15,7 +15,7 @@
         "client",
         "authorization",
         "authorisation",
-        "gitlab"
+        "aweber"
     ],
     "require": {
         "php": ">=5.6",
@@ -29,16 +29,16 @@
         "phpunit/phpunit": "^5.7 || ^7.3"
     },
     "suggest": {
-        "m4tthumphrey/php-gitlab-api": "For further API usage using the acquired OAuth2 token"
+        //"m4tthumphrey/php-gitlab-api": "For further API usage using the acquired OAuth2 token"
     },
     "autoload": {
         "psr-4": {
-            "Omines\\OAuth2\\Client\\": "src/"
+            "Elementroot\\OAuth2\\Client\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Omines\\OAuth2\\Client\\Test\\": "test/src/"
+            "Elementroot\\OAuth2\\Client\\Test\\": "test/src/"
         }
     },
     "conflict": {

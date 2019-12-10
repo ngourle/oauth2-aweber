@@ -1,4 +1,4 @@
-# GitLab Provider for OAuth 2.0 Client
+# Aweber Provider for OAuth 2.0 Client
 [![Latest Version](https://img.shields.io/github/release/omines/oauth2-gitlab.svg?style=flat-square)](https://github.com/omines/oauth2-gitlab/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://img.shields.io/travis/omines/oauth2-gitlab/master.svg?style=flat-square)](https://travis-ci.org/omines/oauth2-gitlab)
@@ -16,7 +16,7 @@ of GitLab is required use version 2 of this library.
 To install, use composer:
 
 ```
-composer require omines/oauth2-gitlab
+composer require ngourle/oauth2-aweber
 ```
 
 ## Usage
